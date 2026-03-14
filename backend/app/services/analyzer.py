@@ -7,10 +7,11 @@ import json
 
 class GitHubAnalyzer:
     def __init__(self):
+        self.openai_api_key = settings.OPENAI_API_KEY or "sk-dummy-key-for-testing"
         self.llm = ChatOpenAI(
             model="gpt-4-turbo", 
             temperature=0, 
-            openai_api_key=settings.OPENAI_API_KEY
+            openai_api_key=self.openai_api_key
         )
         self.github_token = settings.GITHUB_TOKEN
 
