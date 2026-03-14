@@ -23,7 +23,7 @@ class GitHubAnalyzer:
         headers = {"Authorization": f"token {self.github_token}"} if self.github_token else {}
         
         response = requests.get(api_url, headers=headers)
-        if response.status_status == 200:
+        if response.status_code == 200:
             return response.json()
         return None
 
@@ -43,7 +43,7 @@ class GitHubAnalyzer:
         chain = prompt | self.llm
         result = await chain.ainvoke({
             "repo_data": json.dumps(repo_data),
-            "readme_content": readme_content[:4000] # Truncate for token limits
+            "readme_content": (readme_content or "")[:4000] # Truncate for token limits
         })
         
         try:
