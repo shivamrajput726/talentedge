@@ -1,0 +1,85 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum AiStatus {
+  pending
+  processing
+  ready
+  failed
+}
+
+model Project {
+  id          String   @id @default(uuid())
+  name        String
+  description String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  adrs         Adr[]
+  healthChecks ProjectHealthCheck[]
+}
+
+model Adr {
+  id           String   @id @default(uuid())
+  projectId    String
+  project      Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  title        String
+  status       String
+  context      String
+  options      Json
+  preferredOption String?
+  decision     String
+  consequences String
+
+  aiStatus     AiStatus @default(pending)
+  error        String?
+
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  reviews      AdrReview[]
+
+  @@index([projectId])
+}
+
+model AdrReview {
+  id                    String   @id @default(uuid())
+  adrId                 String
+  adr                   Adr      @relation(fields: [adrId], references: [id], onDelete: Cascade)
+
+  summary               String
+  strengths             Json
+  risks                 Json
+  suggestedImprovements Json
+
+  aiStatus              AiStatus @default(pending)
+  error                 String?
+
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  @@index([adrId])
+}
+
+model ProjectHealthCheck {
+  id        String   @id @default(uuid())
+  projectId String
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  result    Json
+
+  aiStatus  AiStatus @default(pending)
+  error     String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([projectId])
+}
