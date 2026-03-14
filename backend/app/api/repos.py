@@ -10,7 +10,21 @@ router = APIRouter(prefix="/repos", tags=["repositories"])
 class RepoCreate(BaseModel):
     url: str
 
-@router.post("/analyze")
+class RepositoryResponse(BaseModel):
+    id: int
+    url: str
+    name: str | None
+    description: str | None
+    language: str | None
+    stars: int | None
+    analysis_status: str
+    skills_detected: dict | None
+    ai_summary: str | None
+
+    class Config:
+        from_attributes = True
+
+@router.post("/analyze", response_model=RepositoryResponse)
 async def analyze_repo(repo_in: RepoCreate, db: Session = Depends(get_db)):
     # Check if exists
     db_repo = db.query(Repository).filter(Repository.url == repo_in.url).first()
@@ -46,6 +60,6 @@ async def analyze_repo(repo_in: RepoCreate, db: Session = Depends(get_db)):
     
     return new_repo
 
-@router.get("/")
+@router.get("/", response_model=list[RepositoryResponse])
 def list_repos(db: Session = Depends(get_db)):
     return db.query(Repository).all()
