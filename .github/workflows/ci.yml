@@ -25,6 +25,7 @@ jobs:
     - name: Run Backend Tests
       run: |
         cd backend
+        export PYTHONPATH=$PYTHONPATH:.
         pytest
         
     - name: Set up Node.js
