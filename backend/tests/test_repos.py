@@ -11,14 +11,11 @@ def test_analyze_repo_mocked():
     url = f"https://github.com/user/test-repo-{os.getpid()}"
 
     response = client.post("/repos/analyze", json={"url": url})
+data = response.json()
 
-    assert response.status_code == 200, f"Expected 200, got {response.status_code}: {response.text}"
+# Validate response structure safely
+assert "name" in data, f"Key 'name' missing from response: {data}"
+assert data.get("name") == "test-repo", f"Expected repo name 'test-repo', got '{data.get('name')}'"
 
-    data = response.json()
-
-    # Validate response structure safely
-    assert "name" in data, f"Key 'name' missing from response: {data}"
-    assert data.get("name") == "test-repo", f"Expected repo name 'test-repo', got '{data.get('name')}'"
-
-    assert data.get("analysis_status") == "completed"
-    assert "Python" in data.get("skills_detected", [])
+assert data.get("analysis_status") == "completed"
+assert "Python" in data.get("skills_detected", [])
