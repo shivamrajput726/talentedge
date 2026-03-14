@@ -5,12 +5,6 @@ import pytest
 
 client = TestClient(app)
 
-@pytest.fixture(autouse=True)
-def setup_db():
-    Base.metadata.create_all(bind=engine)
-    yield
-    Base.metadata.drop_all(bind=engine)
-
 def test_analyze_repo_mocked():
     # Since we mocked GitHubAnalyzer in conftest.py, this won't hit the network or OpenAI
     response = client.post("/repos/analyze", json={"url": "https://github.com/user/test-repo"})
