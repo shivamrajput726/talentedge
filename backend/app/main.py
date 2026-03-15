@@ -2,6 +2,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from .config import settings
 from .api import repos
+from fastapi.staticfiles import StaticFiles
+import os
 
 app = FastAPI(title=settings.PROJECT_NAME)
 
@@ -22,3 +24,8 @@ async def root():
 @app.get("/health")
 async def health_check():
     return {"status": "healthy"}
+
+# Serve frontend static files
+# In Docker, we'll copy the dist folder here
+if os.path.exists("static"):
+    app.mount("/", StaticFiles(directory="static", html=True), name="static")
